@@ -50,10 +50,16 @@ class Book extends Component {
 ========== This is for an individual bookshelf ===========
 */
 class BookShelf extends Component {
+  /*
+  Somewhere here we want to call the API method to get the list of books and then based on the type of bookshelf component we created (i.e. currently reading, want to read, read), we create an array of those books and then create the books in that bookshelf
+
+  Or maybe create the full array of books on the BooksPage components and pass that array through the the children components
+  */
+
   render() {
     return (
       <div className="bookshelf">
-        <h2 className="bookshelf-title">Currently Reading</h2>
+        <h2 className="bookshelf-title">{this.props.shelfTitle}</h2>
         <div className="bookshelf-books">
           <ol className="books-grid">
             <Book />
@@ -98,9 +104,34 @@ class BookShelf extends Component {
 ========== Main Page for the Book Listings ===========
 */
 class BooksPage extends Component {
+  state = {
+    boxOfBooks: [],
+    booksCurrentlyReading: [],
+    booksWantToRead: [],
+    booksAlreadyRead: []
+  };
+
+  // Get a list of all the books here with AJAX request
+  componentDidMount() {
+    // this will run right after the component is added to the DOM
+    BooksAPI.getAll().then(books => {
+      this.setState({ boxOfBooks: books });
+      this.setState({
+        booksCurrentlyReading: this.state.boxOfBooks.filter(
+          book => book.shelf === "currentlyReading"
+        ),
+        booksWantToRead: this.state.boxOfBooks.filter(
+          book => book.shelf === "wantToRead"
+        ),
+        booksAlreadyRead: this.state.boxOfBooks.filter(
+          book => book.shelf === "read"
+        )
+      });
+    });
+  }
+
   render() {
-    // TEMP: Logging out promise request
-    console.log(BooksAPI.getAll());
+    console.log(this.state.boxOfBooks);
     return (
       <div className="list-books">
         <div className="list-books-title">
@@ -108,7 +139,7 @@ class BooksPage extends Component {
         </div>
         <div className="list-books-content">
           <div>
-            <BookShelf />
+            <BookShelf shelfTitle="Currently Reading" />
             <div className="bookshelf">
               <h2 className="bookshelf-title">Want to Read</h2>
               <div className="bookshelf-books">
