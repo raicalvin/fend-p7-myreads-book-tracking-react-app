@@ -6,19 +6,19 @@ import "./App.css";
 ========== This is for a selection menu ===========
 */
 class Select extends Component {
-  state = {
-    value: "None"
-  };
   render() {
+    console.log(this.props.currentValue);
     return (
-      <select>
+      <select onChange={e => this.props.onBookChange(e)}>
         <option value="move" disabled>
           Move to...
         </option>
         <option value="currentlyReading">Currently Reading</option>
         <option value="wantToRead">Want to Read</option>
         <option value="read">Read</option>
-        <option value="none">None</option>
+        <option value="none" defaultValue="Selected">
+          None
+        </option>
       </select>
     );
   }
@@ -43,7 +43,10 @@ class Book extends Component {
               }}
             />
             <div className="book-shelf-changer">
-              <Select />
+              <Select
+                currentValue={this.props.shelf}
+                onBookChange={this.props.onBookChange}
+              />
             </div>
           </div>
           <div className="book-title">{this.props.title}</div>
@@ -77,6 +80,7 @@ class BookShelf extends Component {
                 image={book.imageLinks.thumbnail}
                 shelf={book.shelf}
                 key={book.id}
+                onBookChange={this.props.onBookChange}
               />
             ))}
           </ol>
@@ -118,11 +122,10 @@ class BooksPage extends Component {
 
   // this function will handle state management when the user selects a new category
   // we're using this patten since we are updating the state based on the current state
-  changeBookCategory = book => {
-    this.setState(state => {
-      console.log("Heeeyyyyy");
-    });
-  };
+  changeBookCategory(val) {
+    console.log("Heyyy");
+    console.log(val.target);
+  }
 
   render() {
     console.log(this.state.boxOfBooks);
