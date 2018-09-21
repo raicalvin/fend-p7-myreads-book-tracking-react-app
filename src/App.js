@@ -6,10 +6,17 @@ import "./App.css";
 ========== This is for a selection menu ===========
 */
 class Select extends Component {
+  state = {
+    bookName: this.props.bookName
+  };
   render() {
     console.log(this.props.currentValue);
     return (
-      <select onChange={e => this.props.onBookChange(e)}>
+      <select
+        onChange={e =>
+          this.props.onBookChange(e.target.value, this.state.bookName)
+        }
+      >
         <option value="move" disabled>
           Move to...
         </option>
@@ -46,6 +53,7 @@ class Book extends Component {
               <Select
                 currentValue={this.props.shelf}
                 onBookChange={this.props.onBookChange}
+                bookName={this.props.title}
               />
             </div>
           </div>
@@ -103,6 +111,7 @@ class BooksPage extends Component {
 
   // Get a list of all the books here with AJAX request
   componentDidMount() {
+    console.log("componentDidMount Run");
     // this will run right after the component is added to the DOM
     BooksAPI.getAll().then(books => {
       this.setState({ boxOfBooks: books });
@@ -118,13 +127,22 @@ class BooksPage extends Component {
         )
       });
     });
+    console.log(this.state.boxOfBooks);
   }
 
   // this function will handle state management when the user selects a new category
   // we're using this patten since we are updating the state based on the current state
-  changeBookCategory(val) {
+  changeBookCategory(shelfCatValue, bookNameValue) {
     console.log("Heyyy");
-    console.log(val.target);
+    console.log(shelfCatValue);
+    console.log(bookNameValue);
+    console.log(this.state.boxOfBooks); // this works...but why?
+    this.state.booksCurrentlyReading.pop();
+
+    this.setState(state => ({
+      boxOfBooks: [shelfCatValue, bookNameValue]
+    }));
+    // Now we need to call setState here and update the state in this BooksPage component
   }
 
   render() {
@@ -139,15 +157,17 @@ class BooksPage extends Component {
             <BookShelf
               shelfTitle="Currently Reading"
               booksInThisShelf={this.state.booksCurrentlyReading}
-              onBookChange={this.changeBookCategory}
+              onBookChange={this.changeBookCategory.bind(this)}
             />
             <BookShelf
               shelfTitle="Want to Read"
               booksInThisShelf={this.state.booksWantToRead}
+              onBookChange={this.changeBookCategory}
             />
             <BookShelf
               shelfTitle="Read"
               booksInThisShelf={this.state.booksAlreadyRead}
+              onBookChange={this.changeBookCategory}
             />
 
             <div className="bookshelf">
