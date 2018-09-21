@@ -3,17 +3,33 @@ import * as BooksAPI from "./BooksAPI";
 import "./App.css";
 
 /*
+========== This is for a selection menu ===========
+*/
+class Select extends Component {
+  state = {
+    value: "None"
+  };
+  render() {
+    return (
+      <select>
+        <option value="move" disabled>
+          Move to...
+        </option>
+        <option value="currentlyReading">Currently Reading</option>
+        <option value="wantToRead">Want to Read</option>
+        <option value="read">Read</option>
+        <option value="none">None</option>
+      </select>
+    );
+  }
+}
+
+/*
 ========== This is for an individual book item ===========
 */
 class Book extends Component {
-  state = {
-    bookTitle: "To Kill a Mockingbird",
-    bookAuthor: "Harper Lee",
-    backgroundImage:
-      'url("http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73-GnPVEyb7MOCxDzOYF1PTQRuf6nCss9LMNOSWBpxBrz8Pm2_mFtWMMg_Y1dx92HT7cUoQBeSWjs3oEztBVhUeDFQX6-tWlWz1-feexS0mlJPjotcwFqAg6hBYDXuK_bkyHD-y&source=gbs_api")',
-    bookShelf: "Currently Reading"
-  };
   render() {
+    // console.log(this.props.image);
     return (
       <li>
         <div className="book">
@@ -23,23 +39,15 @@ class Book extends Component {
               style={{
                 width: 128,
                 height: 193,
-                backgroundImage: `${this.state.backgroundImage}`
+                backgroundImage: `url(${this.props.image})`
               }}
             />
             <div className="book-shelf-changer">
-              <select>
-                <option value="move" disabled>
-                  Move to...
-                </option>
-                <option value="currentlyReading">Currently Reading</option>
-                <option value="wantToRead">Want to Read</option>
-                <option value="read">Read</option>
-                <option value="none">None</option>
-              </select>
+              <Select />
             </div>
           </div>
-          <div className="book-title">{this.state.bookTitle}</div>
-          <div className="book-authors">{this.state.bookAuthor}</div>
+          <div className="book-title">{this.props.title}</div>
+          <div className="book-authors">{this.props.author}</div>
         </div>
       </li>
     );
@@ -50,49 +58,27 @@ class Book extends Component {
 ========== This is for an individual bookshelf ===========
 */
 class BookShelf extends Component {
-  /*
-  Somewhere here we want to call the API method to get the list of books and then based on the type of bookshelf component we created (i.e. currently reading, want to read, read), we create an array of those books and then create the books in that bookshelf
-
-  Or maybe create the full array of books on the BooksPage components and pass that array through the the children components
-  */
+  // state = {
+  //   books: this.props.booksInThisShelf,
+  //   bookShelf: this.props.shelfTitle
+  // };
 
   render() {
+    // console.log(this.props);
     return (
       <div className="bookshelf">
         <h2 className="bookshelf-title">{this.props.shelfTitle}</h2>
         <div className="bookshelf-books">
           <ol className="books-grid">
-            <Book />
-            <li>
-              <div className="book">
-                <div className="book-top">
-                  <div
-                    className="book-cover"
-                    style={{
-                      width: 128,
-                      height: 188,
-                      backgroundImage:
-                        'url("http://books.google.com/books/content?id=yDtCuFHXbAYC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE72RRiTR6U5OUg3IY_LpHTL2NztVWAuZYNFE8dUuC0VlYabeyegLzpAnDPeWxE6RHi0C2ehrR9Gv20LH2dtjpbcUcs8YnH5VCCAH0Y2ICaKOTvrZTCObQbsfp4UbDqQyGISCZfGN&source=gbs_api")'
-                    }}
-                  />
-                  <div className="book-shelf-changer">
-                    <select>
-                      <option value="move" disabled>
-                        Move to...
-                      </option>
-                      <option value="currentlyReading">
-                        Currently Reading
-                      </option>
-                      <option value="wantToRead">Want to Read</option>
-                      <option value="read">Read</option>
-                      <option value="none">None</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="book-title">Ender's Game</div>
-                <div className="book-authors">Orson Scott Card</div>
-              </div>
-            </li>
+            {this.props.booksInThisShelf.map(book => (
+              <Book
+                title={book.title}
+                author={book.authors}
+                image={book.imageLinks.thumbnail}
+                shelf={book.shelf}
+                key={book.id}
+              />
+            ))}
           </ol>
         </div>
       </div>
@@ -130,6 +116,14 @@ class BooksPage extends Component {
     });
   }
 
+  // this function will handle state management when the user selects a new category
+  // we're using this patten since we are updating the state based on the current state
+  changeBookCategory = book => {
+    this.setState(state => {
+      console.log("Heeeyyyyy");
+    });
+  };
+
   render() {
     console.log(this.state.boxOfBooks);
     return (
@@ -139,7 +133,20 @@ class BooksPage extends Component {
         </div>
         <div className="list-books-content">
           <div>
-            <BookShelf shelfTitle="Currently Reading" />
+            <BookShelf
+              shelfTitle="Currently Reading"
+              booksInThisShelf={this.state.booksCurrentlyReading}
+              onBookChange={this.changeBookCategory}
+            />
+            <BookShelf
+              shelfTitle="Want to Read"
+              booksInThisShelf={this.state.booksWantToRead}
+            />
+            <BookShelf
+              shelfTitle="Read"
+              booksInThisShelf={this.state.booksAlreadyRead}
+            />
+
             <div className="bookshelf">
               <h2 className="bookshelf-title">Want to Read</h2>
               <div className="bookshelf-books">
