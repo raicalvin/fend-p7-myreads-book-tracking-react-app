@@ -119,17 +119,19 @@ class BooksPage extends Component {
   componentDidMount() {
     // this will run right after the component is added to the DOM
     BooksAPI.getAll().then(books => {
-      this.setState({ boxOfBooks: books });
+      // sort all the books first into vairables
+      let tBoxOfBooks = books;
+      let tBooksCurrentlyReading = books.filter(
+        book => book.shelf === "currentlyReading"
+      );
+      let tBooksWantToRead = books.filter(book => book.shelf === "wantToRead");
+      let tBooksAlreadyRead = books.filter(book => book.shelf === "read");
+
       this.setState({
-        booksCurrentlyReading: this.state.boxOfBooks.filter(
-          book => book.shelf === "currentlyReading"
-        ),
-        booksWantToRead: this.state.boxOfBooks.filter(
-          book => book.shelf === "wantToRead"
-        ),
-        booksAlreadyRead: this.state.boxOfBooks.filter(
-          book => book.shelf === "read"
-        )
+        boxOfBooks: tBoxOfBooks,
+        booksCurrentlyReading: tBooksCurrentlyReading,
+        booksWantToRead: tBooksWantToRead,
+        booksAlreadyRead: tBooksAlreadyRead
       });
     });
   }
@@ -137,20 +139,29 @@ class BooksPage extends Component {
   // this function will handle state management when the user selects a new category
   // we're using this patten since we are updating the state based on the current state
   changeBookCategory(shelfCatValue, bookNameValue, bookId) {
-    // this.state.booksCurrentlyReading.pop();
-    this.setState(state => ({
-      boxOfBooks: this.state.boxOfBooks.forEach(book => {
-        if (book.id === bookId) {
-          book.id = bookId;
-        }
-      })
-    }));
     // Now we need to call setState here and update the state in this BooksPage component
-    BooksAPI.update({ id: bookId }, shelfCatValue);
+    BooksAPI.update({ id: bookId }, shelfCatValue).then(obj => {
+      BooksAPI.getAll().then(books => {
+        let tBoxOfBooks = books;
+        let tBooksCurrentlyReading = books.filter(
+          book => book.shelf === "currentlyReading"
+        );
+        let tBooksWantToRead = books.filter(
+          book => book.shelf === "wantToRead"
+        );
+        let tBooksAlreadyRead = books.filter(book => book.shelf === "read");
+        this.setState({
+          boxOfBooks: tBoxOfBooks,
+          booksCurrentlyReading: tBooksCurrentlyReading,
+          booksWantToRead: tBooksWantToRead,
+          booksAlreadyRead: tBooksAlreadyRead
+        });
+      });
+    });
   }
 
   render() {
-    console.log(this.state.boxOfBooks);
+    console.log(this.state.booksCurrentlyReading);
     return (
       <div className="list-books">
         <div className="list-books-title">
