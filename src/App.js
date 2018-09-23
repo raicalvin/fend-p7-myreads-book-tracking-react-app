@@ -187,6 +187,14 @@ class BooksPage extends Component {
             />
           </div>
         </div>
+        <div className="open-search">
+          <Link
+            to="/search"
+            onClick={() => this.setState({ showSearchPage: true })}
+          >
+            Add a book
+          </Link>
+        </div>
       </div>
     );
   }
@@ -245,19 +253,12 @@ class BooksApp extends Component {
   render() {
     return (
       <div className="app">
-        {this.state.showSearchPage ? (
-          <SearchPage onNav={this.onNavigateBack.bind(this)} />
-        ) : (
-          <BooksPage />
-        )}
-        <div className="open-search">
-          <Link
-            to="/search"
-            onClick={() => this.setState({ showSearchPage: true })}
-          >
-            Add a book
-          </Link>
-        </div>
+        <Route exact path="/" render={() => <BooksPage />} />
+
+        <Route
+          path="/search"
+          render={() => <SearchPage onNav={this.onNavigateBack.bind(this)} />}
+        />
       </div>
     );
   }
