@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import * as BooksAPI from "./BooksAPI";
 import "./App.css";
+import { Link } from "react-router-dom";
+import { Route } from "react-router-dom";
 
 /*
 ========== This is for a selection menu ===========
@@ -198,9 +200,13 @@ class SearchPage extends Component {
     return (
       <div className="search-books">
         <div className="search-books-bar">
-          <a className="close-search" onClick={() => this.props.onNav()}>
+          <Link
+            to="/"
+            className="close-search"
+            onClick={() => this.props.onNav()}
+          >
             Close
-          </a>
+          </Link>
           <div className="search-books-input-wrapper">
             {/*
                   NOTES: The search from BooksAPI is limited to a particular set of search terms.
@@ -245,9 +251,12 @@ class BooksApp extends Component {
           <BooksPage />
         )}
         <div className="open-search">
-          <a onClick={() => this.setState({ showSearchPage: true })}>
+          <Link
+            to="/search"
+            onClick={() => this.setState({ showSearchPage: true })}
+          >
             Add a book
-          </a>
+          </Link>
         </div>
       </div>
     );
