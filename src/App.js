@@ -161,7 +161,6 @@ class BooksPage extends Component {
   }
 
   render() {
-    console.log(this.state.booksCurrentlyReading);
     return (
       <div className="list-books">
         <div className="list-books-title">
@@ -186,18 +185,13 @@ class BooksPage extends Component {
             />
           </div>
         </div>
-        <div className="open-search">
-          <a onClick={() => this.setState({ showSearchPage: true })}>
-            Add a book
-          </a>
-        </div>
       </div>
     );
   }
 }
 
 /*
-Main Page for the search page
+========== Main Page for the Search Page ===========
 */
 class SearchPage extends Component {
   render() {
@@ -230,19 +224,14 @@ class SearchPage extends Component {
   }
 }
 
-/* ==================== ORIGINAL CODE BELOW ===================== */
-
+/*
+========== Main Page for the App ===========
+*/
 class BooksApp extends Component {
   // TODO: Make a 2 large-scale components: one for the Main Page and one for the Search Page
   // You'll use a Router later on to route between these two components
 
   state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
     showSearchPage: false
   };
 
@@ -250,9 +239,41 @@ class BooksApp extends Component {
     return (
       <div className="app">
         {this.state.showSearchPage ? <SearchPage /> : <BooksPage />}
+        <div className="open-search">
+          <a onClick={() => this.setState({ showSearchPage: true })}>
+            Add a book
+          </a>
+        </div>
       </div>
     );
   }
 }
 
 export default BooksApp;
+
+/* ==================== ORIGINAL CODE BELOW ===================== */
+
+// class BooksApp extends Component {
+//   // TODO: Make a 2 large-scale components: one for the Main Page and one for the Search Page
+//   // You'll use a Router later on to route between these two components
+
+//   state = {
+//     /**
+//      * TODO: Instead of using this state variable to keep track of which page
+//      * we're on, use the URL in the browser's address bar. This will ensure that
+//      * users can use the browser's back and forward buttons to navigate between
+//      * pages, as well as provide a good URL they can bookmark and share.
+//      */
+//     showSearchPage: false
+//   };
+
+//   render() {
+//     return (
+//       <div className="app">
+//         {this.state.showSearchPage ? <SearchPage /> : <BooksPage />}
+//       </div>
+//     );
+//   }
+// }
+
+// export default BooksApp;
