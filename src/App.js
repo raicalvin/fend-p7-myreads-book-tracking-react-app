@@ -198,10 +198,7 @@ class SearchPage extends Component {
     return (
       <div className="search-books">
         <div className="search-books-bar">
-          <a
-            className="close-search"
-            onClick={() => this.setState({ showSearchPage: false })}
-          >
+          <a className="close-search" onClick={() => this.props.onNav()}>
             Close
           </a>
           <div className="search-books-input-wrapper">
@@ -235,10 +232,18 @@ class BooksApp extends Component {
     showSearchPage: false
   };
 
+  onNavigateBack() {
+    this.setState({ showSearchPage: false });
+  }
+
   render() {
     return (
       <div className="app">
-        {this.state.showSearchPage ? <SearchPage /> : <BooksPage />}
+        {this.state.showSearchPage ? (
+          <SearchPage onNav={this.onNavigateBack.bind(this)} />
+        ) : (
+          <BooksPage />
+        )}
         <div className="open-search">
           <a onClick={() => this.setState({ showSearchPage: true })}>
             Add a book
