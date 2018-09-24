@@ -16,12 +16,38 @@ class Select extends Component {
   render() {
     return (
       <select
-        onChange={e =>
-          this.props.onBookChange(
-            e.target.value,
-            this.state.bookName,
-            this.state.bookId
-          )
+        onChange={
+          // console.log(this.props.from)
+          e => {
+            this.props.from === "BooksPage"
+              ? this.props.onBookChange(
+                  e.target.value,
+                  this.state.bookName,
+                  this.state.bookId,
+                  this.props.obj
+                )
+              : this.props.onBookAdd(e.target.value, this.props.obj);
+          }
+          // e =>
+          //   this.props.onBookChange(
+          //     e.target.value,
+          //     this.state.bookName,
+          //     this.state.bookId,
+          //     this.props.obj
+          //   )
+          // function(e) {
+          //   console.log(this.props.from);
+          //   if (this.props.from === "SearchPage") {
+          //     this.props.onBookAdd();
+          //   } else {
+          //     this.props.onBookChange(
+          //       e.target.value,
+          //       this.state.bookName,
+          //       this.state.bookId,
+          //       this.props.obj
+          //     );
+          //   }
+          // }
         }
         value={this.props.shelf}
       >
@@ -61,6 +87,9 @@ class Book extends Component {
                 bookName={this.props.title}
                 bookId={this.props.bookId}
                 shelf={this.props.shelf}
+                obj={this.props.obj}
+                from={this.props.from}
+                onBookAdd={this.props.onBookAdd}
               />
             </div>
           </div>
@@ -76,11 +105,6 @@ class Book extends Component {
 ========== This is for an individual bookshelf ===========
 */
 class BookShelf extends Component {
-  // state = {
-  //   books: this.props.booksInThisShelf,
-  //   bookShelf: this.props.shelfTitle
-  // };
-
   render() {
     return (
       <div className="bookshelf">
@@ -96,6 +120,7 @@ class BookShelf extends Component {
                 key={book.id}
                 bookId={book.id}
                 onBookChange={this.props.onBookChange}
+                from={this.props.from}
               />
             ))}
           </ol>
@@ -106,7 +131,7 @@ class BookShelf extends Component {
 }
 
 /*
-========== Main Page for the Book Listings ===========
+========== Main Page for the BOOKS Page ===========
 */
 class BooksPage extends Component {
   // Anytime state changes, the UI will update automatically
@@ -128,7 +153,6 @@ class BooksPage extends Component {
       );
       let tBooksWantToRead = books.filter(book => book.shelf === "wantToRead");
       let tBooksAlreadyRead = books.filter(book => book.shelf === "read");
-
       this.setState({
         boxOfBooks: tBoxOfBooks,
         booksCurrentlyReading: tBooksCurrentlyReading,
@@ -140,7 +164,8 @@ class BooksPage extends Component {
 
   // this function will handle state management when the user selects a new category
   // we're using this patten since we are updating the state based on the current state
-  changeBookCategory(shelfCatValue, bookNameValue, bookId) {
+  changeBookCategory(shelfCatValue, bookNameValue, bookId, bookObj) {
+    console.log(bookObj);
     // Now we need to call setState here and update the state in this BooksPage component
     BooksAPI.update({ id: bookId }, shelfCatValue).then(obj => {
       BooksAPI.getAll().then(books => {
@@ -174,16 +199,19 @@ class BooksPage extends Component {
               shelfTitle="Currently Reading"
               booksInThisShelf={this.state.booksCurrentlyReading}
               onBookChange={this.changeBookCategory.bind(this)}
+              from="BooksPage"
             />
             <BookShelf
               shelfTitle="Want to Read"
               booksInThisShelf={this.state.booksWantToRead}
               onBookChange={this.changeBookCategory.bind(this)}
+              from="BooksPage"
             />
             <BookShelf
               shelfTitle="Read"
               booksInThisShelf={this.state.booksAlreadyRead}
               onBookChange={this.changeBookCategory.bind(this)}
+              from="BooksPage"
             />
           </div>
         </div>
@@ -201,18 +229,82 @@ class BooksPage extends Component {
 }
 
 /*
-========== Main Page for the Search Page ===========
+========== Main Page for the SEARCH Page ===========
 */
 class SearchPage extends Component {
+  state = {
+    placeholderText: "Search by title or author",
+    query: "",
+    searchBookList: [],
+    defaultShelf: "none"
+  };
+
+  showLiveResults = event => {
+    try {
+      if (this.state.searchBookList.length !== 0) {
+        this.setState({ searchBookList: [] });
+      }
+      if (event.length !== 0) {
+        BooksAPI.search(event).then(results => {
+          if (!results.error) {
+            results.forEach(bk => {
+              bk.shelf = "none"; // place all books on none initially
+            });
+
+            BooksAPI.getAll().then(books => {
+              // do something to results
+              for (let i = 0; i < books.length; i++) {
+                let cBook = books[i];
+                for (let j = 0; j < results.length; j++) {
+                  let cResult = results[j];
+                  if (cBook.id === cResult.id) {
+                    results[j].shelf = cBook.shelf;
+                    console.log(results[j].shelf);
+                  }
+                }
+              }
+
+              this.setState({
+                searchBookList: results
+              });
+            });
+          }
+        });
+      }
+    } catch (err) {
+      alert("Please enter valid search results");
+    }
+  };
+
+  searchBookCategoryChanged(shelfValue, bookToAdd) {
+    bookToAdd.shelf = shelfValue;
+    BooksAPI.update(bookToAdd, shelfValue).then(console.log("Book updated"));
+    this.forceUpdate();
+  }
+
   render() {
+    console.log(this.state.searchBookList);
+    let list;
+    if (this.state.searchBookList !== undefined) {
+      list = this.state.searchBookList.map(bk => (
+        <Book
+          obj={bk}
+          title={bk.title}
+          author={bk.authors}
+          image={bk.imageLinks.thumbnail}
+          shelf={bk.shelf} // change this based on new filtered list
+          key={bk.id}
+          bookId={bk.id}
+          onBookAdd={this.searchBookCategoryChanged.bind(this)}
+          from="SearchPage"
+        />
+      ));
+    }
+
     return (
       <div className="search-books">
         <div className="search-books-bar">
-          <Link
-            to="/"
-            className="close-search"
-            onClick={() => this.props.onNav()}
-          >
+          <Link to="/" className="close-search">
             Close
           </Link>
           <div className="search-books-input-wrapper">
@@ -224,11 +316,17 @@ class SearchPage extends Component {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-            <input type="text" placeholder="Search by title or author" />
+            <input
+              type="text"
+              placeholder={this.state.placeholderText}
+              onChange={e => this.showLiveResults(e.target.value)}
+              value={this.state.placeholderTextquery}
+            />
           </div>
         </div>
+        {/*Add the search results to this grid below*/}
         <div className="search-books-results">
-          <ol className="books-grid" />
+          <ol className="books-grid">{list}</ol>
         </div>
       </div>
     );
@@ -236,7 +334,7 @@ class SearchPage extends Component {
 }
 
 /*
-========== Main Page for the App ===========
+========== PARENT MAIN Page ===========
 */
 class BooksApp extends Component {
   // TODO: Make a 2 large-scale components: one for the Main Page and one for the Search Page
@@ -254,7 +352,6 @@ class BooksApp extends Component {
     return (
       <div className="app">
         <Route exact path="/" render={() => <BooksPage />} />
-
         <Route
           path="/search"
           render={() => <SearchPage onNav={this.onNavigateBack.bind(this)} />}
