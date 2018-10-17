@@ -1,22 +1,21 @@
-# Web App: MyReads Book Tracking React App
+# React App: MyReads Book Tracking App
 
 ## Project Information
 
 ### About
 
-This web application uses React to compose a single-page application that keeps tracks of a users book list. The user can sort their books onto different shelves, search for new books to add to their shelves, and manage books between shelves. This project was for my Udacity Front-End Developer Nanodegree.
+This web application uses React to compose a single-page application that keeps tracks of a user's book list. The user can sort their books onto different shelves, search for new books to add to their shelves, and manage books between shelves. This project was for my Udacity Front-End Developer Nanodegree.
 
-## User Interface
+### Concepts
 
-Coming soon...
+The primary technologies used in the development of this app were:
 
-## User Experience
-
-Coming soon...
+- React to construct the UI, handle state changes, and store methods and properties to manage the site
+- An external BooksAPI to provide a backend for the handful of books a user could search for and add
+- React Router to manage the apps locations between the main page and the search page
+- Promises & asynchronous Javascript to handle update requests for the books catalog
 
 ## Getting Started
-
-This section should briefly describe how a user can download and/or start implementing this project/library/code on their local machine. Provide a brief description of the overview of the process, download necessary, and how the installation will proceed.
 
 ### Prerequisites
 
@@ -49,6 +48,7 @@ npm start
 ## Built With
 
 - [React](https://reactjs.org/) - Official documentation site
+- [React Router](https://reacttraining.com/react-router/) - React Router documentation
 
 ## Authors
 
